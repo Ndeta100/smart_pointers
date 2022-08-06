@@ -1,3 +1,5 @@
+use std::{cell::RefCell, rc::Rc};
+
 //RefCell<T> and the interior Mutability Pattern
 pub trait Messenger {
     fn send(&self, msg: &str);
@@ -59,4 +61,20 @@ mod test {
         limit_tracker.set_value(80);
         assert_eq!(mock_messenger.sent_message.borrow().len(), 1);
     }
+}
+#[derive(Debug)]
+enum List {
+    Cons(Rc<RefCell<i32>>, Rc<List>),
+    Nil,
+}
+use crate::List::{Cons, Nil};
+pub fn ref_cell() {
+    let value = Rc::new(RefCell::new(4));
+    let a = Rc::new(Cons(Rc::clone(&value), Rc::new(Nil)));
+    let b = Cons(Rc::new(RefCell::new(3)), Rc::clone(&a));
+    let c = Cons(Rc::new(RefCell::new(5)), Rc::clone(&a));
+    *value.borrow_mut() += 10;
+    println!("a after ={:?}", a);
+    println!("b after ={:?}", b);
+    println!("c after ={:?}", c);
 }
