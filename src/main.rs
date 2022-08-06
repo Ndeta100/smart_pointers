@@ -1,4 +1,4 @@
-use std::ops::Deref;
+use std::{ops::Deref, rc::Rc};
 
 fn main() {
     let s = vec!["Germany", "&Estonia"];
@@ -39,7 +39,24 @@ fn main() {
         data: String::from("Do stuff ott=her stuff"),
     };
     println!("Custome Smart pointer created.");
+
+    let a = Rc::new(Cons(5, Rc::new(Cons(10, Rc::new(Nil)))));
+    println!("Count after creating a ={}", Rc::strong_count(&a));
+    let n = Cons(3, Rc::clone(&a));
+    println!("Count after creating n={}", Rc::strong_count(&a));
+    {
+        let ccm = Cons(4, Rc::clone(&a));
+        println!("Count after creating n={}", Rc::strong_count(&a));
+    }
+    println!("Count after creating n={}", Rc::strong_count(&a));
 }
+//RC<T>, the reference counted smart pointer
+enum ListRC {
+    Cons(i32, Rc<ListRC>),
+    Nil,
+}
+use crate::ListRC::{Cons, Nil};
+
 struct CustomSmartPointer {
     data: String,
 }
