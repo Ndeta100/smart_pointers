@@ -1,4 +1,8 @@
-use std::{cell::RefCell, rc::Rc};
+use std::{
+    borrow::Borrow,
+    cell::RefCell,
+    rc::{Rc, Weak},
+};
 
 //RefCell<T> and the interior Mutability Pattern
 pub trait Messenger {
@@ -82,16 +86,21 @@ pub fn ref_cell() {
 #[derive(Debug)]
 struct Node {
     value: i32,
+    parents: RefCell<Weak<Node>>,
     children: RefCell<Vec<Rc<Node>>>,
 }
 fn main() {
     let leaf = Rc::new(Node {
         value: 3,
+        parents: RefCell::new(Weak::new()),
         children: RefCell::new(vec![]),
     });
     let branch = Rc::new(Node {
         value: 5,
+        parents: RefCell::new(Weak::new()),
         children: RefCell::new(vec![Rc::clone(&leaf)]),
     });
+    *leaf.parents.borrow_mut() = Rc::downgrade(&branch);
+    println!("Leaf parent {:?}", leaf.parents.borrow().upgrade());
     ref_cell();
 }
